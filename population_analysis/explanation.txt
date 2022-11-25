@@ -1,0 +1,13 @@
+Columns in our dataset:
+•	Country (or dependency): Included countries. | Nominal Data
+•	Population (2022): World 2022 population. | Quantitative Data
+•	Yearly change: Percentage of the population change between 2021-2022 | Quantitative Data
+•	Net change: Yearly net population change of a country. | Quantitative Data
+•	Density: Based on P/Km². | Quantitative Data
+•	Land Area (Km²): Land Area based on Km².
+•	Migrants (net): People number who migrate in 2022. If it is (+) the country gets migrants, else (-) the country gives migrants. | Quantitative Data
+•	Fert. Rate: Fertility rate | Quantitative Data
+•	Med.Age : Median Age| Quantitative Data
+•	Urban Pop %: Population percentage who lives out of the city centre | Quantitative Data
+•	World Share: Population share of a country in the world. | Quantitative Data
+
