@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from sklearn.linear_model import LinearRegression
 from sklearn.impute import KNNImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -37,6 +41,7 @@ for _, country, population, yearly_change, net_change, density, land_area, migra
     med_age_list.append(None if med_age == "N.A." else int(med_age))
     urb_pop_list.append(None if urb_pop == "N.A." else float(urb_pop.replace("%", "")) / 100)
     share_pop_list.append(float(share_pop.replace("%", "")))
+    
    
 dataset["Country (or dependency)"] = country_list #Ülke isimleri
 dataset["Population (2022)"] = population_list #Popülasyon
@@ -153,7 +158,61 @@ dataset.corr(numeric_only=True)
 
 plt.plot(dataset["Fert. Rate"], dataset["Med.Age"], "o", color="green")
 plt.plot(dataset["Fert. Rate"], y_pred, color="orange")
-plt.title("Med.Age by Fertility Rate")
+plt.title("Fertilitiy Rate by Medium Age")
 plt.xlabel("Fertility Rate")
-plt.ylabel("Med.Age")
+plt.ylabel("Medium Age")
 plt.savefig("lr1")
+
+first_country_list=[]
+for _,_,_,_,_,_,_,_,fertility,_,urbpop,_ in dataset.values:
+    first_country_list.append(True if urbpop > 0.7 and fertility < 4 else False)
+
+dataset["First Country"] = first_country_list
+
+#CONFUSION MATRIX
+
+#normalization
+y = dataset["First Country"]
+
+x_data = dataset.drop(["Country (or dependency)", "First Country"], axis=1)
+print(x_data)
+x= (x_data-np.min(x_data))/(np.max(x_data) - np.min(x_data))
+
+#train test split
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.3,random_state=15)
+print(x_train)
+#random forest score
+rfc = RandomForestClassifier()
+rfc.fit(x_train,y_train)
+print(rfc.score(x_test,y_test))
+
+#creating confusion matrix
+y_pred=rfc.predict(x_test)
+y_true=y_test
+
+cm=confusion_matrix(y_true,y_pred)
+print(cm)
+
+#visualising confusion matrix
+
+figure, ax = plt.subplots(figsize=(5,5))
+sns.heatmap(cm, annot=True, linewidths=0.5, linecolor="red", fmt=".0f", ax=ax)
+plt.title("Confusion Matrix of Yearly Change")
+plt.xlabel("Real First Class Country")
+plt.ylabel("Predict First Class Country")
+plt.show() 
+
+
+#Calculation of precision, recall, f1_score and accuracy
+tp = cm[0,0]
+fp = cm[1,0]
+fn = cm[0,1]
+tn = cm[1,1]
+
+precision = tp / (tp+fp)
+recall = tp / (tp+fn)
+f1_score = 2 *(precision * recall)/(precision + recall)
+accuracy = (tp + tn)/(tp + tn + fp + fn)
+
+print("Precision: {}\nRecall: {}\nF1 Score: {}\nAccuracy: {}"
+      .format(precision, recall, f1_score, accuracy))
