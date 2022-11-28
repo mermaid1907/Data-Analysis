@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from sklearn.linear_model import LinearRegression
+from sklearn.impute import KNNImputer
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -55,7 +56,6 @@ print(dataset.dtypes)
 
 ###################### GRAPHS ###########################
 
-
 #PIE CHARTS 
 #Top Ten Population Sharing Countries
 dataset = dataset.sort_values("World Share", ascending=False)
@@ -63,7 +63,7 @@ plt.pie(dataset["World Share"].head(10), labels = dataset["Country (or dependenc
 plt.title("Top Ten Population Sharing Countries")
 plt.savefig("worldshare.jpg")
 plt.close()
- 
+
 #Top Ten Land Area Sharing Countries
 dataset = dataset.sort_values("Land Area (Km²)", ascending=False)
 plt.pie(dataset["Land Area (Km²)"].head(10), labels = dataset["Country (or dependency)"].head(10))
@@ -79,20 +79,20 @@ plt.savefig("top10density.jpg")
 plt.close()
 
 #SCATTER GRAPHS
-#Connection Between Fertility Rate and Medium Age
-plt.scatter(dataset["Med.Age"], dataset["Fert. Rate"])
-plt.title("Connection Between Fertility Rate and Medium Age")
-plt.xlabel("Med.Age")
-plt.ylabel("Fert. Rate")
-plt.savefig("fertility_mediumage.jpg")
-plt.close()
-
 #Connection Between Fertility Rate and Urban Population
-plt.scatter(dataset["Urban Pop %"], dataset["Fert. Rate"])
+plt.scatter(dataset["Urban Pop %"], dataset["Fert. Rate"], color="pink")
 plt.title("Connection Between Fertility Rate and Urban Population")
 plt.xlabel("Urban Pop %")
 plt.ylabel("Fert. Rate")
 plt.savefig("urbanpopulation_fertility.jpg")
+plt.close()
+
+#Connection Between Fertility Rate and Medium Age
+plt.scatter(dataset["Med.Age"], dataset["Fert. Rate"], color="red")
+plt.title("Connection Between Fertility Rate and Medium Age")
+plt.xlabel("Med.Age")
+plt.ylabel("Fert. Rate")
+plt.savefig("fertility_mediumage.jpg")
 plt.close()
 
 #Change of Population from Density(People/Km2)
@@ -103,29 +103,57 @@ plt.ylabel("Yearly change")
 plt.savefig("populaiton_density.jpg")
 plt.close()
 
+#Connection Between Fertility Rate and Yearly Change
+plt.scatter(dataset["Yearly change"], dataset["Fert. Rate"])
+plt.title("Connection Between Fertility Rate and Medium Age")
+plt.xlabel("Med.Age")
+plt.ylabel("Fert. Rate")
+plt.savefig("yearly_fertility.jpg")
+plt.close()
+
+
 
 ###################### NaN's ###########################
+#fertility rate: 34 migrants: 34 med.age: 34 urban pop:13 
 
 print("The rows that contain NaN's")
 empty_rows = dataset.isna().sum()
 print(empty_rows)
 
 #using KNN algorithm to fill the NaN's
-imputer = KNNImputer(n_neighbors=3)
-dataset = imputer.fit_transform(dataset)
-print("After Operation /n", dataset)
+#imputer = KNNImputer(missing_values=None, strategy="mean")
+#knn = imputer.fit_transform(dataset["Yearly change"].values.reshape(-1,1), dataset["Fert. Rate"])
+
+#using fillna() to replace all the None values with the mean of that column
+dataset['Migrants (net)'].fillna(dataset['Migrants (net)'].mean(), inplace=True)
+dataset['Fert. Rate'].fillna(dataset['Fert. Rate'].mean(), inplace=True)
+dataset['Med.Age'].fillna(dataset['Med.Age'].mean(), inplace=True)
+dataset['Urban Pop %'].fillna(dataset['Urban Pop %'].mean(), inplace=True)
 
 
-'''
 ###################### LINEAR REGRESSION ###########################
 
 
 lr = LinearRegression()
-model = lr.fit(dataset["Population (2022)"].values.reshape(-1, 1), dataset["Med.Age"] )
+model = lr.fit(dataset["Fert. Rate"].values.reshape(-1, 1), dataset["Med.Age"] )
 
 print(model.intercept_) #y-intercept (regression constant)
 print(model.coef_) #regression coefficient, slope
-'''
 
 
+#y_pred = 90*model.coef_ + model.intercept_
+y_pred = model.predict(dataset["Fert. Rate"].values.reshape(-1,1))
 
+
+#R squared -coefficient of determination
+# %77 of the variation in fertility rate is explained by its medium age 
+print(model.score(dataset["Fert. Rate"].values.reshape(-1, 1), dataset["Med.Age"]))
+
+dataset.corr(numeric_only=True)
+
+plt.plot(dataset["Fert. Rate"], dataset["Med.Age"], "o", color="green")
+plt.plot(dataset["Fert. Rate"], y_pred, color="orange")
+plt.title("Med.Age by Fertility Rate")
+plt.xlabel("Fertility Rate")
+plt.ylabel("Med.Age")
+plt.savefig("lr1")
