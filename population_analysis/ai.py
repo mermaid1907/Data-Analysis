@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -62,7 +63,7 @@ plt.pie(dataset["World Share"].head(10), labels = dataset["Country (or dependenc
 plt.title("Top Ten Population Sharing Countries")
 plt.savefig("worldshare.jpg")
 plt.close()
-
+ 
 #Top Ten Land Area Sharing Countries
 dataset = dataset.sort_values("Land Area (Km²)", ascending=False)
 plt.pie(dataset["Land Area (Km²)"].head(10), labels = dataset["Country (or dependency)"].head(10))
@@ -101,3 +102,30 @@ plt.xlabel("Density (P/Km²)")
 plt.ylabel("Yearly change")
 plt.savefig("populaiton_density.jpg")
 plt.close()
+
+
+###################### NaN's ###########################
+
+print("The rows that contain NaN's")
+empty_rows = dataset.isna().sum()
+print(empty_rows)
+
+#using KNN algorithm to fill the NaN's
+imputer = KNNImputer(n_neighbors=3)
+dataset = imputer.fit_transform(dataset)
+print("After Operation /n", dataset)
+
+
+'''
+###################### LINEAR REGRESSION ###########################
+
+
+lr = LinearRegression()
+model = lr.fit(dataset["Population (2022)"].values.reshape(-1, 1), dataset["Med.Age"] )
+
+print(model.intercept_) #y-intercept (regression constant)
+print(model.coef_) #regression coefficient, slope
+'''
+
+
+
