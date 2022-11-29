@@ -4,6 +4,7 @@ from sklearn.impute import KNNImputer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -163,11 +164,24 @@ plt.xlabel("Fertility Rate")
 plt.ylabel("Medium Age")
 plt.savefig("lr1")
 
+
+#MIN MAX SCALER
+
+min_max_scaler = preprocessing.MinMaxScaler()
+
+dataset["Fert. Rate"] = pd.DataFrame(min_max_scaler
+                                        .fit_transform(pd.DataFrame(dataset["Fert. Rate"])))
+
+dataset["Urban Pop %"] = pd.DataFrame(min_max_scaler
+                                        .fit_transform(pd.DataFrame(dataset["Urban Pop %"])))
+
 first_country_list=[]
 for _,_,_,_,_,_,_,_,fertility,_,urbpop,_ in dataset.values:
-    first_country_list.append(True if urbpop > 0.7 and fertility < 4 else False)
+    
+    first_country_list.append(True if urbpop > 0.7 and fertility < 0.4 else False)
 
 dataset["First Country"] = first_country_list
+
 
 #CONFUSION MATRIX
 
