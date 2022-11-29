@@ -111,7 +111,7 @@ plt.close()
 
 #Connection Between Fertility Rate and Yearly Change
 plt.scatter(dataset["Yearly change"], dataset["Fert. Rate"])
-plt.title("Connection Between Fertility Rate and Medium Age")
+plt.title("Connection Between Fertility Rate and Yearly Change")
 plt.xlabel("Med.Age")
 plt.ylabel("Fert. Rate")
 plt.savefig("yearly_fertility.jpg")
@@ -165,15 +165,11 @@ plt.ylabel("Medium Age")
 plt.savefig("lr1")
 
 
-#MIN MAX SCALER
+######################### MIN MAX SCALER ########################
 
 min_max_scaler = preprocessing.MinMaxScaler()
 
-dataset["Fert. Rate"] = pd.DataFrame(min_max_scaler
-                                        .fit_transform(pd.DataFrame(dataset["Fert. Rate"])))
-
-dataset["Urban Pop %"] = pd.DataFrame(min_max_scaler
-                                        .fit_transform(pd.DataFrame(dataset["Urban Pop %"])))
+dataset["Fert. Rate"] = pd.DataFrame(min_max_scaler.fit_transform(pd.DataFrame(dataset["Fert. Rate"])))
 
 first_country_list=[]
 for _,_,_,_,_,_,_,_,fertility,_,urbpop,_ in dataset.values:
@@ -183,8 +179,7 @@ for _,_,_,_,_,_,_,_,fertility,_,urbpop,_ in dataset.values:
 dataset["First Country"] = first_country_list
 
 
-#CONFUSION MATRIX
-
+######################## CONFUSION MATRIX #######################
 #normalization
 y = dataset["First Country"]
 
@@ -193,7 +188,7 @@ print(x_data)
 x= (x_data-np.min(x_data))/(np.max(x_data) - np.min(x_data))
 
 #train test split
-x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.3,random_state=15)
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.3,random_state=3)
 print(x_train)
 #random forest score
 rfc = RandomForestClassifier()
@@ -211,7 +206,7 @@ print(cm)
 
 figure, ax = plt.subplots(figsize=(5,5))
 sns.heatmap(cm, annot=True, linewidths=0.5, linecolor="red", fmt=".0f", ax=ax)
-plt.title("Confusion Matrix of Yearly Change")
+plt.title("Confusion Matrix of First Country")
 plt.xlabel("Real First Class Country")
 plt.ylabel("Predict First Class Country")
 plt.show() 
@@ -228,5 +223,4 @@ recall = tp / (tp+fn)
 f1_score = 2 *(precision * recall)/(precision + recall)
 accuracy = (tp + tn)/(tp + tn + fp + fn)
 
-print("Precision: {}\nRecall: {}\nF1 Score: {}\nAccuracy: {}"
-      .format(precision, recall, f1_score, accuracy))
+print("Precision: {}\nRecall: {}\nF1 Score: {}\nAccuracy: {}".format(precision, recall, f1_score, accuracy))
