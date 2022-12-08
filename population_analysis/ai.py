@@ -142,10 +142,8 @@ dataset['Urban Pop %'].fillna(dataset['Urban Pop %'].mean(), inplace=True)
 
 lr = LinearRegression()
 model = lr.fit(dataset["Fert. Rate"].values.reshape(-1, 1), dataset["Med.Age"] )
-
-print(model.intercept_) #y-intercept (regression constant)
-print(model.coef_) #regression coefficient, slope
-
+print("model intercept: " + model.intercept_) #y-intercept (regression constant)
+print("model coef: " + model.coef_) #regression coefficient, slope
 
 #y_pred = 90*model.coef_ + model.intercept_
 y_pred = model.predict(dataset["Fert. Rate"].values.reshape(-1,1))
@@ -163,6 +161,7 @@ plt.title("Fertilitiy Rate by Medium Age")
 plt.xlabel("Fertility Rate")
 plt.ylabel("Medium Age")
 plt.savefig("lr1")
+plt.close()
 
 
 ######################### MIN MAX SCALER ########################
@@ -182,7 +181,6 @@ dataset["First Country"] = first_country_list
 ######################## CONFUSION MATRIX #######################
 #normalization
 y = dataset["First Country"]
-
 x_data = dataset.drop(["Country (or dependency)", "First Country"], axis=1)
 print(x_data)
 x= (x_data-np.min(x_data))/(np.max(x_data) - np.min(x_data))
@@ -209,7 +207,8 @@ sns.heatmap(cm, annot=True, linewidths=0.5, linecolor="red", fmt=".0f", ax=ax)
 plt.title("Confusion Matrix of First Country")
 plt.xlabel("Real First Class Country")
 plt.ylabel("Predict First Class Country")
-plt.show() 
+plt.savefig("confussion_matrix.jpg")
+plt.close() 
 
 
 #Calculation of precision, recall, f1_score and accuracy
